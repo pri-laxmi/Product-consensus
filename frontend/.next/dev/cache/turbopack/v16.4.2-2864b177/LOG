@@ -74,3 +74,30 @@ FAM | META SEQ | SST SEQ         | RANGE
     |          | 00000006 00000019 00000025 00000026 SST DELETED
     |          | 00000021 00000031 META DELETED
     |          | 00000018 00000029 META DELETED
+Time 2026-10-19T19:20:02.136807Z
+Commit 00000046 4949 keys in 8ms 412µs 800ns
+FAM | META SEQ | SST SEQ         | RANGE
+  0 | 00000043 | 00000042 SST    |                                                                             O                        | c44bdff4074eecdb-c44bdff4074eecdb (0 MiB, fresh, 38 bytes, 1 entries, 0 tombstones)
+  3 | 00000044 | 00000040 SST    |  [=============================================================================================]     | 02f77a82dafbacb1-f56c3e42fe65940a (0 MiB, fresh, 333 bytes, 25 entries, 0 tombstones)
+  2 | 00000045 | 00000039 SST    | [==================================================================================================] | 00d4599dbc362d51-ff078261c00f822a (0 MiB, fresh, 358412 bytes, 169 entries, 0 tombstones)
+  1 | 00000046 | 00000041 SST    | [==================================================================================================] | 000dfd05692b99f0-ffdd9bdaf732ae0a (0 MiB, fresh, 887117 bytes, 4754 entries, 0 tombstones)
+Time 2026-10-19T19:34:04.2763407Z
+Commit 00000052 484 keys in 11ms 273µs 300ns
+FAM | META SEQ | SST SEQ         | RANGE
+  2 | 00000050 | 00000047 SST    |                                                                                                    O | ff078261c00f822a-ff078261c00f822a (0 MiB, fresh, 443 bytes, 1 entries, 0 tombstones)
+  1 | 00000051 | 00000048 SST    | [==================================================================================================] | 01319201325d8723-ffca057218b1a357 (0 MiB, fresh, 309714 bytes, 482 entries, 0 tombstones)
+  0 | 00000052 | 00000049 SST    |                                                                             O                        | c44bdff4074eecdb-c44bdff4074eecdb (0 MiB, fresh, 38 bytes, 1 entries, 0 tombstones)
+Time 2026-10-19T19:53:48.3455993Z
+Commit 00000060 3153 keys in 9ms 12µs 600ns
+FAM | META SEQ | SST SEQ         | RANGE
+  0 | 00000057 | 00000056 SST    |                                                                             O                        | c44bdff4074eecdb-c44bdff4074eecdb (0 MiB, fresh, 38 bytes, 1 entries, 0 tombstones)
+  3 | 00000058 | 00000054 SST    |     [=====================================================================================]          | 0b9ade6d625e3c1e-e76ffbc2a10b427b (0 MiB, fresh, 81 bytes, 4 entries, 0 tombstones)
+  2 | 00000059 | 00000053 SST    | [===============================================================================================]    | 00d4599dbc362d51-f6ff48cb3e66cddc (0 MiB, fresh, 294033 bytes, 54 entries, 0 tombstones)
+  1 | 00000060 | 00000055 SST    | [==================================================================================================] | 00355af1f5325f8b-ffdd9bdaf732ae0a (0 MiB, fresh, 722702 bytes, 3094 entries, 0 tombstones)
+Time 2026-10-20T15:16:07.775342Z
+Commit 00000068 1499 keys in 12ms 693µs 700ns
+FAM | META SEQ | SST SEQ         | RANGE
+  3 | 00000065 | 00000061 SST    |      [========================================================]                                      | 0d522871ab602c9a-a103a09c7dc4fdda (0 MiB, fresh, 69 bytes, 3 entries, 0 tombstones)
+  2 | 00000066 | 00000062 SST    | [==================================================================================================] | 00d4599dbc362d51-ff078261c00f822a (0 MiB, fresh, 276948 bytes, 80 entries, 0 tombstones)
+  0 | 00000067 | 00000064 SST    |                                                                             O                        | c44bdff4074eecdb-c44bdff4074eecdb (0 MiB, fresh, 38 bytes, 1 entries, 0 tombstones)
+  1 | 00000068 | 00000063 SST    | [==================================================================================================] | 000dfd05692b99f0-ffca057218b1a357 (0 MiB, fresh, 451306 bytes, 1415 entries, 0 tombstones)

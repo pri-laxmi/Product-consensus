@@ -1,0 +1,17 @@
+
+services:
+  db:
+    image: pgvector/pgvector:0.8.7-pg18-trixie
+    container_name: product-consensus-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: product_consensus
+      POSTGRES_USER: consensus_user
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in the root .env file}
+    ports:
+      - "5433:5432"
+    volumes:
+      - consensus_data:/var/lib/postgresql
+
+volumes:
+  consensus_data:

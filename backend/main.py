@@ -1,15 +1,19 @@
 
 import asyncio
+import logging
 import os
 
 import httpx
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ValidationError
 from evidence import analyze_source
+from consensus import process_sources
 
 load_dotenv()
+
+logger = logging.getLogger(__name__)
 
 app = FastAPI(title="Product Consensus AI")
 
@@ -55,7 +59,7 @@ async def search_web(client: httpx.AsyncClient, query: str):
 
 
 async def analyze_results(product: str, sources: list[dict]):
-    # Limit Gemini calls in this first version to control cost.
+    # Limit concurrent model calls to control provider usage.
     semaphore = asyncio.Semaphore(3)
 
     async def process_source(source: dict):
@@ -77,18 +81,72 @@ async def analyze_results(product: str, sources: list[dict]):
                     "analysis_error": None,
                 }
 
-            except Exception as exc:
-                # Preserve the search result if analysis fails.
-                print(
-                    f"Evidence analysis failed for "
-                    f"{source.get('url', 'unknown source')}: "
-                    f"{type(exc).__name__}"
-                )
+            except (
+                httpx.HTTPStatusError,
+                httpx.RequestError,
+                RuntimeError,
+                ValueError,
+            ) as exc:
+                analysis_error = "Evidence analysis unavailable."
+                if isinstance(exc, httpx.HTTPStatusError):
+                    status_code = exc.response.status_code
+                    if status_code == 429:
+                        analysis_error = (
+                            "Groq API rate limit or quota reached. "
+                            "Check your Groq account limits and try again."
+                        )
+                    elif status_code in (401, 403):
+                        analysis_error = (
+                            "Groq rejected the API key or model access. "
+                            "Check GROQ_API_KEY and GROQ_MODEL in the backend environment."
+                        )
+                    elif status_code == 404:
+                        analysis_error = (
+                            "Groq could not find the configured model. "
+                            "Set GROQ_MODEL to an active model, such as "
+                            "openai/gpt-oss-120b, then restart the backend."
+                        )
+                    else:
+                        analysis_error = (
+                            f"Groq analysis request failed (HTTP {status_code})."
+                        )
+                    logger.warning(
+                        "Groq evidence analysis failed for %s: HTTP %s",
+                        source.get("url", "unknown source"),
+                        status_code,
+                    )
+                elif isinstance(exc, httpx.RequestError):
+                    analysis_error = "Could not connect to Groq for evidence analysis."
+                    logger.warning(
+                        "Groq evidence analysis failed for %s: %s",
+                        source.get("url", "unknown source"),
+                        type(exc).__name__,
+                    )
+                elif isinstance(exc, ValidationError):
+                    issues = ", ".join(
+                        f"{'.'.join(map(str, issue['loc']))}: {issue['type']}"
+                        for issue in exc.errors(include_input=False)
+                    )
+                    logger.warning(
+                        "Groq evidence response validation failed for %s: %s",
+                        source.get("url", "unknown source"),
+                        issues or "invalid response",
+                    )
+                    analysis_error = (
+                        "Groq returned evidence in an invalid format. "
+                        "Check the backend log for the failed field."
+                    )
+                else:
+                    logger.warning(
+                        "Evidence analysis failed for %s: %s",
+                        source.get("url", "unknown source"),
+                        type(exc).__name__,
+                    )
 
                 return {
                     **source,
                     "evidence": [],
-                    "analysis_error": "Evidence analysis unavailable",
+                    "analysis_error": analysis_error,
                 }
 
     return await asyncio.gather(
@@ -139,7 +197,7 @@ async def research(request: ResearchRequest):
                     seen_urls.add(url)
                     sources.append(source)
 
-        sources = sources[:10]  
+        sources = sources[:3]
         analyzed_sources = await analyze_results(product, sources)
         all_evidence = [
             {
@@ -151,12 +209,14 @@ async def research(request: ResearchRequest):
             for item in source["evidence"]
             if item["is_product_relevant"]
         ]
+        consensus = process_sources(analyzed_sources)
         return{
             "product_name": product,
             "sources": analyzed_sources,
             "evidence_count": len(all_evidence),
             "evidence": all_evidence,
             "source_count": len(analyzed_sources),
+            "consensus": consensus,
         } 
 
     except httpx.HTTPStatusError as exc:
