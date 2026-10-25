@@ -1,28 +1,10 @@
-{"timestamp":"00:00:10.825","source":"Server","level":"LOG","message":""}
-{"timestamp":"00:46:46.660","source":"Server","level":"LOG","message":"○ Compiling / ..."}
-{"timestamp":"00:46:50.620","source":"Server","level":"WARN","message":"⚠ Blocked cross-origin request to Next.js dev resource /_next/hmr from \"192.168.1.34\".\nCross-origin access to Next.js dev resources is blocked by default for safety.\n\nTo allow this host in development, add it to \"allowedDevOrigins\" in next.config.js and restart the dev server:\n\n// next.config.js\nmodule.exports = {\n  allowedDevOrigins: ['192.168.1.34'],\n}\n\nRead more: https://nextjs.org/docs/app/api-reference/config/next-config-js/allowedDevOrigins"}
-{"timestamp":"01:13:06.396","source":"Browser","level":"INFO","message":"Download the React DevTools for a better development experience: https://react.dev/link/react-devtools"}
-{"timestamp":"01:13:13.668","source":"Browser","level":"LOG","message":"Search button clicked"}
-{"timestamp":"01:13:13.668","source":"Browser","level":"LOG","message":"Sending request to: http://localhost:8000/api/research"}
-{"timestamp":"01:46:45.981","source":"Browser","level":"INFO","message":"Download the React DevTools for a better development experience: https://react.dev/link/react-devtools"}
-{"timestamp":"01:46:49.942","source":"Browser","level":"LOG","message":"Search button clicked"}
-{"timestamp":"01:46:49.942","source":"Browser","level":"LOG","message":"Sending request to: http://localhost:8000/api/research"}
-{"timestamp":"01:56:07.792","source":"Server","level":"LOG","message":"✓ Compiled in 108ms"}
-{"timestamp":"02:10:51.875","source":"Browser","level":"INFO","message":"Download the React DevTools for a better development experience: https://react.dev/link/react-devtools"}
-{"timestamp":"02:14:51.480","source":"Browser","level":"LOG","message":"Search button clicked"}
-{"timestamp":"02:14:51.480","source":"Browser","level":"LOG","message":"Sending request to: http://localhost:8000/api/research"}
-{"timestamp":"02:14:58.326","source":"Browser","level":"INFO","message":"Download the React DevTools for a better development experience: https://react.dev/link/react-devtools"}
-{"timestamp":"02:15:38.696","source":"Browser","level":"LOG","message":"Search button clicked"}
-{"timestamp":"02:15:38.696","source":"Browser","level":"LOG","message":"Sending request to: http://localhost:8000/api/research"}
-{"timestamp":"02:27:26.571","source":"Browser","level":"INFO","message":"Download the React DevTools for a better development experience: https://react.dev/link/react-devtools"}
-{"timestamp":"02:27:30.858","source":"Browser","level":"LOG","message":"Search button clicked"}
-{"timestamp":"02:27:30.858","source":"Browser","level":"LOG","message":"Sending request to: http://localhost:8000/api/research"}
-{"timestamp":"02:28:05.053","source":"Browser","level":"INFO","message":"Download the React DevTools for a better development experience: https://react.dev/link/react-devtools"}
-{"timestamp":"03:12:40.568","source":"Browser","level":"INFO","message":"Download the React DevTools for a better development experience: https://react.dev/link/react-devtools"}
-{"timestamp":"03:12:43.869","source":"Browser","level":"LOG","message":"Search button clicked"}
-{"timestamp":"03:12:43.869","source":"Browser","level":"LOG","message":"Sending request to: http://localhost:8000/api/research"}
-{"timestamp":"03:13:09.354","source":"Browser","level":"LOG","message":"Search button clicked"}
-{"timestamp":"03:13:09.354","source":"Browser","level":"LOG","message":"Sending request to: http://localhost:8000/api/research"}
-{"timestamp":"03:17:59.431","source":"Browser","level":"LOG","message":"Search button clicked"}
-{"timestamp":"03:17:59.431","source":"Browser","level":"LOG","message":"Sending request to: http://localhost:8000/api/research"}
-{"timestamp":"17:03:42.291","source":"Browser","level":"INFO","message":"Download the React DevTools for a better development experience: https://react.dev/link/react-devtools"}
+{"timestamp":"00:00:16.373","source":"Server","level":"LOG","message":""}
+{"timestamp":"00:03:39.849","source":"Server","level":"LOG","message":"○ Compiling / ..."}
+{"timestamp":"00:03:45.036","source":"Browser","level":"INFO","message":"Download the React DevTools for a better development experience: https://react.dev/link/react-devtools"}
+{"timestamp":"00:04:26.869","source":"Browser","level":"LOG","message":"Search button clicked"}
+{"timestamp":"00:04:26.869","source":"Browser","level":"LOG","message":"Sending request to: http://localhost:8000/api/research"}
+{"timestamp":"00:19:58.557","source":"Browser","level":"INFO","message":"Download the React DevTools for a better development experience: https://react.dev/link/react-devtools"}
+{"timestamp":"00:20:02.479","source":"Browser","level":"LOG","message":"Search button clicked"}
+{"timestamp":"00:20:02.479","source":"Browser","level":"LOG","message":"Sending request to: http://localhost:8000/api/research"}
+{"timestamp":"00:24:07.420","source":"Browser","level":"LOG","message":"Search button clicked"}
+{"timestamp":"00:24:07.420","source":"Browser","level":"LOG","message":"Sending request to: http://localhost:8000/api/research"}

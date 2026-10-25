@@ -10,6 +10,15 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field, ValidationError
 from evidence import analyze_source
 from consensus import process_sources
+import re
+from datetime import datetime, timezone
+
+from sqlalchemy import select
+from sqlalchemy.exc import OperationalError
+from sqlalchemy.orm import Session
+
+from database import SessionLocal
+from model import Product, ResearchSession, Source, Evidence
 
 load_dotenv()
 
@@ -158,6 +167,95 @@ async def health():
     return {"status": "ok", "service": "product-consensus-api"}
 
 
+def save_research(
+    product_name: str,
+    analyzed_sources: list[dict],
+) -> int:
+    normalized_name = re.sub(
+        r"\s+", " ", product_name.strip().lower()
+    )
+
+    with SessionLocal() as db:
+        try:
+            # Reuse an existing product or create one.
+            product = db.scalar(
+                select(Product).where(
+                    Product.normalized_name == normalized_name
+                )
+            )
+
+            if product is None:
+                product = Product(
+                    name=product_name.strip(),
+                    normalized_name=normalized_name,
+                )
+                db.add(product)
+                db.flush()
+
+            # Each search gets a separate research session.
+            research_session = ResearchSession(
+                product_id=product.id,
+                status="processing",
+            )
+            db.add(research_session)
+            db.flush()
+
+            # Persist every source, even when extraction failed.
+            for source_data in analyzed_sources:
+                url = source_data.get("url", "").strip()
+                if not url:
+                    continue
+
+                source_items = source_data.get("evidence", [])
+
+                source_type = (
+                    source_items[0].get("source_type", "other")
+                    if source_items
+                    else "other"
+                )
+
+                source = Source(
+                    research_session_id=research_session.id,
+                    url=url,
+                    title=(
+                        source_data.get("title") or "Untitled source"
+                    )[:500],
+                    source_type=source_type,
+                    content=source_data.get("content", ""),
+                )
+                db.add(source)
+                db.flush()
+
+                # Save extracted evidence linked to its source.
+                for item in source_items:
+                    db.add(
+                        Evidence(
+                            source_id=source.id,
+                            aspect=item.get("aspect") or "general",
+                            sentiment=item.get("sentiment", "uncertain"),
+                            claim=item.get("claim", ""),
+                            evidence_excerpt=item.get(
+                                "evidence_excerpt", ""
+                            ),
+                            confidence=item.get("confidence", 0.0),
+                            is_product_relevant=item.get(
+                                "is_product_relevant", False
+                            ),
+                        )
+                    )
+
+            research_session.status = "completed"
+            research_session.completed_at = datetime.now(timezone.utc)
+
+            db.commit()
+            return research_session.id
+
+        except Exception:
+            db.rollback()
+            raise
+
+
+
 @app.post("/api/research")
 async def research(request: ResearchRequest):
     if not TAVILY_API_KEY:
@@ -210,15 +308,40 @@ async def research(request: ResearchRequest):
             if item["is_product_relevant"]
         ]
         consensus = process_sources(analyzed_sources)
-        return{
+
+        try:
+            research_session_id = save_research(
+                product_name=product,
+                analyzed_sources=analyzed_sources,
+            )
+        except OperationalError as exc:
+            logger.warning(
+                "PostgreSQL is unavailable while saving research: %s",
+                type(exc).__name__,
+            )
+            raise HTTPException(
+                status_code=503,
+                detail=(
+                    "PostgreSQL is unavailable. Start the database with "
+                    "`docker compose up -d db` and verify localhost:5433 is reachable."
+                ),
+            ) from exc
+        except Exception:
+            logger.exception("Failed to save research to PostgreSQL")
+            raise HTTPException(
+                status_code=500,
+                detail="Research completed, but saving the results failed.",
+            )
+
+        return {
             "product_name": product,
+            "research_session_id": research_session_id,
             "sources": analyzed_sources,
             "evidence_count": len(all_evidence),
             "evidence": all_evidence,
             "source_count": len(analyzed_sources),
             "consensus": consensus,
-        } 
-
+        }
     except httpx.HTTPStatusError as exc:
         raise HTTPException(
             status_code=502,
