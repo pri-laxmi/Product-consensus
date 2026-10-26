@@ -1,5 +1,6 @@
 
 from datetime import datetime
+from pgvector.sqlalchemy import Vector
 
 from sqlalchemy import (
     DateTime,
@@ -103,5 +104,9 @@ class Evidence(Base):
     is_product_relevant: Mapped[bool] = mapped_column(
         default=True, nullable=False
     )
+    embedding: Mapped[list[float] | None] = mapped_column(
+    Vector(384),
+    nullable=True,
+)
 
     source: Mapped["Source"] = relationship(back_populates="evidence_items")
