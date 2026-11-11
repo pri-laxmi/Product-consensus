@@ -16,7 +16,9 @@ from datetime import datetime, timezone
 from sqlalchemy import select
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import Session
-
+from fastapi import Depends
+from database import SessionLocal
+from rag import answer_product_question
 from database import SessionLocal
 from model import Product, ResearchSession, Source, Evidence
 
@@ -36,6 +38,17 @@ app.add_middleware(
 
 TAVILY_API_KEY = os.getenv("TAVILY_API_KEY")
 TAVILY_URL = "https://api.tavily.com/search"
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+class QuestionRequest(BaseModel):
+    product_name: str = Field(min_length=2, max_length=200)
+    question: str = Field(min_length=3, max_length=1000)
 
 
 class ResearchRequest(BaseModel):
@@ -66,7 +79,25 @@ async def search_web(client: httpx.AsyncClient, query: str):
         for item in data.get("results", [])
     ]
 
+@app.post("/api/ask")
+async def ask_product_question(
+    request: QuestionRequest,
+    db: Session = Depends(get_db),
+):
+    try:
+        return answer_product_question(
+            db=db,
+            product_name=request.product_name,
+            question=request.question,
+        )
 
+    except Exception:
+        logger.exception("RAG question answering failed")
+        raise HTTPException(
+            status_code=500,
+            detail="Could not generate an answer.",
+        )
+    
 async def analyze_results(product: str, sources: list[dict]):
     # Limit concurrent model calls to control provider usage.
     semaphore = asyncio.Semaphore(3)
